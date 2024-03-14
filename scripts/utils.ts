@@ -32,26 +32,20 @@ async function getFeeData() {
     return new ethers.FeeData(feeData.gasPrice, maxFeePerGas, maxPriorityFeePerGas);
 }
 
-async function deployContract(contractName: string, alias: string, deployer: any, contractArgs: any, args: any[] = []) {
+async function deployContract(contractName: string, alias: string, options: any, contractArgs: any, args: any[] = []) {
     const network = await ethers.provider.getNetwork();
     const chainId = network.chainId;
     const feeData = await getFeeData();
-    let costLimit;
+    const gasLimit = 8000000;
     if (legacyChainIds.includes(Number(chainId))) {
-        costLimit = {
-            signer: deployer,
-            gasPrice: feeData.gasPrice,
-            gasLimit: 3000000,
-        };
+        options["gasPrice"] = feeData.gasPrice;
+        options["gasLimit"] = gasLimit;
     } else {
-        costLimit = {
-            signer: deployer,
-            maxFeePerGas: feeData.maxFeePerGas,
-            maxPriorityFeePerGas: feeData.maxPriorityFeePerGas,
-            gasLimit: 3000000,
-        };
+        options["maxFeePerGas"] = feeData.maxFeePerGas;
+        options["maxPriorityFeePerGas"] = feeData.maxPriorityFeePerGas;
+        options["gasLimit"] = gasLimit;
     }
-    args.push(costLimit);
+    args.push(options);
     console.log(`---------deploy ${contractName}`);
     const contract = await ethers.deployContract(contractName, ...args);
     await contract.waitForDeployment();
