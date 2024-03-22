@@ -10,8 +10,9 @@ async function main() {
   const proxyAdminArgs = {
     owner: deployer.address
   };
-  await deployContract("ProxyAdmin", "proxyAdmin", deployer, proxyAdminArgs, [[proxyAdminArgs.owner]])
-  await deployContract("Lock", "lock", deployer, null, [])
+  const options = { signer: deployer }
+  await deployContract("ProxyAdmin", "proxyAdmin", options, proxyAdminArgs, [[proxyAdminArgs.owner]])
+  await deployContract("Lock", "lock", options, null, [])
 
   // const Xxx = await artifacts.readArtifact("Xxx");
   // const iface = new ethers.Interface(Xxx.abi);
